@@ -36,14 +36,42 @@ class TicTacToe:
             else:
                 self.current_player = "X"
 
+    #<---------------------------BFS------------------------------>
+
     def get_computer_move(self):
         # created a queue
         q = deque() 
-        v = set()
+        v = set()  # Use a set for visited states
         available_moves = [i for i in range(9) if self.board[i] == ""]
 
+        # Enqueue initial states for available moves
         for move in available_moves:
             new_board = self.board[:]
+            new_board[move] = "O"  # Simulate placing "O"
+            q.append((new_board, move))
+
+        while q:
+            current_state, move = q.popleft()
+
+            # Check if this move wins the game for "O"
+            if self.check_winner("O"):
+                return move  # This move wins the game
+
+            # Check if this state leads to a loss for "X"
+            if self.check_winner("X"):
+                continue  # Skip this state
+
+            # Explore further moves
+            for next_move in available_moves:
+                if current_state[next_move] == "":
+                    new_board = current_state[:]
+                    new_board[next_move] = "X"  # Simulate placing "X"
+                    if tuple(new_board) not in v:  # Check if state is visited
+                        v.add(tuple(new_board))
+                        q.append((new_board, next_move))
+
+        # If no winning move found, return a random available move
+        return random.choice(available_moves)
         
         
 
