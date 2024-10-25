@@ -36,43 +36,13 @@ class TicTacToe:
             else:
                 self.current_player = "X"
 
-    #<---------------------------BFS------------------------------>
+    #<---------------------------DFS------------------------------>
 
     def get_computer_move(self):
-        # created a queue
-        queue = deque() 
-        visited = set()  # Use a set for visited states
+        path = set()
         available_moves = [i for i in range(9) if self.board[i] == ""]
-
-        # checks for available moves by simulating O for each iteration and puts the place available to value in queue as index
-        for move in available_moves:
-            new_board = self.board[:]
-            new_board[move] = "O"
-            queue.append((new_board, move)) #place the index and a list which contains whole game with simulated O place
-            visited.add(tuple(new_board))
-        while queue:
-            current_state, move = queue.popleft() #gets the current state from the queue
-
-            # Check if this move wins the game for "O"
-            if self.check_winner("O"):
-                return move  # This move wins the game
-
-            # Check if this state leads to a loss for "X"
-            if self.check_winner("X"):
-                continue  # Skip this state
-
-            # Explore further moves
-            for next_move in available_moves:
-                if current_state[next_move] == "":
-                    new_board = current_state[:]
-                    new_board[next_move] = "X"  # Simulate placing "X"
-                    if tuple(new_board) not in visited:  # Check if state is visited
-                        visited.add(tuple(new_board))
-                        queue.append((new_board, next_move))
-
-        # If no winning move found, return a random available move
-        return random.choice(available_moves)
         
+
         
 
     def check_winner(self, player):
