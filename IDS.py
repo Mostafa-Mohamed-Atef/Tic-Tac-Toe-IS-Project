@@ -5,7 +5,7 @@ from collections import deque
 class TicTacToe:
     def __init__(self, master):
         self.master = master
-        self.master.title("DFS")
+        self.master.title("IDS")
         self.board = [""] * 9
         self.current_player = "X"
         self.buttons = [tk.Button(master, text="", font='Arial 20', width=5, height=2,
@@ -36,12 +36,11 @@ class TicTacToe:
             else:
                 self.current_player = "X"
 
-    #<---------------------------DFS------------------------------>
+    #<---------------------------IDS------------------------------>
 
     def get_computer_move(self):
-        visited = set()
         available_moves = [i for i in range(9) if self.board[i] == ""]
-        
+
         # First, check if O can win in the next move
         for move in available_moves:
             new_board = self.board[:]
@@ -55,29 +54,37 @@ class TicTacToe:
             new_board[move] = "X"
             if self.check_winner_for_board("X", new_board):
                 return move  # This move blocks X from winning
+
+        # If no immediate win or block is needed, continue with IDS
+        max_depth = len(available_moves)
         
-        def dfs(board, move):
-            if tuple(board) not in visited:
-                visited.add(tuple(board))
+        def ids(board, depth):
+            if depth == 0:
+                return None
             
-            for next_move in range(9):
-                if board[next_move] == "":
+            for move in range(9):
+                if board[move] == "":
                     new_board = board[:]
-                    new_board[next_move] = "X"
-                    result = dfs(new_board, next_move)
+                    new_board[move] = "O"
+                    if self.check_winner_for_board("O", new_board):
+                        return move
+                    result = ids(new_board, depth - 1)
                     if result is not None:
-                        return result
+                        return move
             return None
-        
-        for move in available_moves:
-            new_board = self.board[:]
-            new_board[move] = "O"
-            result = dfs(new_board, move)
-            if result is not None:
-                return result
-            
+
+        for depth in range(1, max_depth + 1):
+            for move in available_moves:
+                new_board = self.board[:]
+                new_board[move] = "O"
+                result = ids(new_board, depth - 1)
+                if result is not None:
+                    return move
+
+        # If no strategic move found, return a random available move
         return random.choice(available_moves)
-    
+
+    # Add this new method to check for a winner on a given board state
     def check_winner_for_board(self, player, board):
         winning_combinations = [(0, 1, 2), (3, 4, 5), (6, 7, 8),
                                 (0, 3, 6), (1, 4, 7), (2, 5, 8),
@@ -85,7 +92,7 @@ class TicTacToe:
         return any(all(board[i] == player for i in combo) for combo in winning_combinations)
 
     def check_winner(self, player):
-        winning_combinations = [(0, 1, 2), (3, 4, 5), (6, 7, 8), #winning rows
+        winning_combinations = [(0, 1, 2), (3, 4,  5), (6, 7, 8), #winning rows
                                 (0, 3, 6), (1, 4, 7), (2, 5, 8), #winning columns
                                 (0, 4, 8), (2, 4, 6)] #winning diagonals
         return any(all(self.board[i] == player for i in combo) for combo in winning_combinations)
@@ -100,4 +107,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     game = TicTacToe(root)
     root.mainloop()
-

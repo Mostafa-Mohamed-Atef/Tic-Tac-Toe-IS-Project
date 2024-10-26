@@ -5,7 +5,7 @@ from collections import deque
 class TicTacToe:
     def __init__(self, master):
         self.master = master
-        self.master.title("Tic Tac Toe")
+        self.master.title("BFS")
         self.board = [""] * 9
         self.current_player = "X"
         self.buttons = [tk.Button(master, text="", font='Arial 20', width=5, height=2,
