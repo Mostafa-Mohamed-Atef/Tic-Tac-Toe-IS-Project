@@ -39,44 +39,54 @@ class TicTacToe:
     #<---------------------------BFS------------------------------>
 
     def get_computer_move(self):
-        # created a queue
-        queue = deque() 
-        visited = set()  # Use a set for visited states
+        queue = deque()
+        visited = set()
         available_moves = [i for i in range(9) if self.board[i] == ""]
 
-        # checks for available moves by simulating O for each iteration and puts the place available to value in queue as index
+        # First, check if O can win in the next move
         for move in available_moves:
             new_board = self.board[:]
             new_board[move] = "O"
-            queue.append((new_board, move)) #place the index and a list which contains whole game with simulated O place
-            visited.add(tuple(new_board))
+            if self.check_winner_for_board("O", new_board):
+                return move  # This move wins the game for O
+
+        # Then, check if X can win in the next move and block it
+        for move in available_moves:
+            new_board = self.board[:]
+            new_board[move] = "X"
+            if self.check_winner_for_board("X", new_board):
+                return move  # This move blocks X from winning
+
+        # If no immediate win or block is needed, continue with BFS
+        for move in available_moves:
+            new_board = self.board[:]
+            new_board[move] = "O"
+            queue.append((new_board, move))
+
         while queue:
-            current_state, move = queue.popleft() #gets the current state from the queue
-
-            # Check if this move wins the game for "O"
-            if self.check_winner("O"):
-                return move  # This move wins the game
-
-            # Check if this state leads to a loss for "X"
-            if self.check_winner("X"):
-                continue  # Skip this state
+            current_state, move = queue.popleft()
 
             # Explore further moves
-            for next_move in available_moves:
+            for next_move in range(9):
                 if current_state[next_move] == "":
                     new_board = current_state[:]
                     new_board[next_move] = "X"  # Simulate placing "X"
-                    if tuple(new_board) not in visited:  # Check if state is visited
+                    if tuple(new_board) not in visited:
                         visited.add(tuple(new_board))
                         queue.append((new_board, next_move))
 
-        # If no winning move found, return a random available move
+        # If no strategic move found, return a random available move
         return random.choice(available_moves)
-        
-        
+
+    # Add this new method to check for a winner on a given board state
+    def check_winner_for_board(self, player, board):
+        winning_combinations = [(0, 1, 2), (3, 4, 5), (6, 7, 8),
+                                (0, 3, 6), (1, 4, 7), (2, 5, 8),
+                                (0, 4, 8), (2, 4, 6)]
+        return any(all(board[i] == player for i in combo) for combo in winning_combinations)
 
     def check_winner(self, player):
-        winning_combinations = [(0, 1, 2), (3, 4, 5), (6, 7, 8), #winning rows
+        winning_combinations = [(0, 1, 2), (3, 4,  5), (6, 7, 8), #winning rows
                                 (0, 3, 6), (1, 4, 7), (2, 5, 8), #winning columns
                                 (0, 4, 8), (2, 4, 6)] #winning diagonals
         return any(all(self.board[i] == player for i in combo) for combo in winning_combinations)
@@ -91,4 +101,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     game = TicTacToe(root)
     root.mainloop()
-
